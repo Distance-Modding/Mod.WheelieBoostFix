@@ -1,15 +1,18 @@
 ﻿using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using JetBrains.Annotations;
-using Spectrum.API.Configuration;
-using Spectrum.API.Interfaces.Plugins;
-using Spectrum.API.Interfaces.Systems;
+using Reactor.API.Attributes;
+using Reactor.API.Configuration;
+//using Reactor.API.Interfaces.Plugins;
+using Reactor.API.Interfaces.Systems;
+using Reactor.API.Runtime.Patching;
 using UnityEngine;
 
 namespace WBFix
 {
     [UsedImplicitly]
-    public class E : IPlugin, IUpdatable
+    [ModEntryPoint("com.seekr.wbfix")]
+    public class Entry : MonoBehaviour
     {
         public static Settings Settings;
 
@@ -21,14 +24,19 @@ namespace WBFix
 
         private static UILabel _watermark;
 
-        public void Initialize(IManager manager, string ipcIdentifier)
+        public void Initialize(IManager manager)
+        {
+            DontDestroyOnLoad(this);
+
+            var harmony = new Harmony("com.seekr.wbfix");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+        }
+
+        public void LateInitialize(IManager manager)
         {
             Settings = InitializeSettings();
 
             _watermark = GetAndActivateWatermark();
-
-            var harmony = HarmonyInstance.Create("com.seekr.wbfix");
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
         }
 
         public void Update()
@@ -123,21 +131,21 @@ namespace WBFix
             var carStats = carLogic ? carLogic.CarStats_ : null;
             var jumpGadget = carLogic ? carLogic.Jump_ : null;
             
-            if (!carLogic.IsLocalCar_ || jumpGadget == null || !E.GameplayCheatsAllowed())
+            if (!carLogic.IsLocalCar_ || jumpGadget == null || !Entry.GameplayCheatsAllowed())
             {
                 return true;
             }
 
-            var debug = E.Settings.GetItem<bool>("debug");
+            var debug = Entry.Settings.GetItem<bool>("debug");
             var jumpTimer = Traverse.Create(jumpGadget).Field("jumpTimer_").GetValue<float>();
 
             if (Timex.PhysicsFrameCount_ % 50 == 0 && debug)
             {
-                System.Console.WriteLine($"Boost Mult: {__instance.accelerationMul_}x; FramesSinceJump: {E.FramesSinceJump}");
+                System.Console.WriteLine($"Boost Mult: {__instance.accelerationMul_}x; FramesSinceJump: {Entry.FramesSinceJump}");
             }
 
             var wheelsContacting = Traverse.Create(carStats).Field("wheelsContactingSmooth_").GetValue<int>();
-            var wheelThreshold = E.Settings.GetItem<int>("wheel_threshold");
+            var wheelThreshold = Entry.Settings.GetItem<int>("wheel_threshold");
 
             if (jumpTimer < _prevJumpTimer) // Just jumped
             {
@@ -146,21 +154,21 @@ namespace WBFix
                     System.Console.WriteLine("Jumped");
                 }
                 
-                E.FramesSinceJump = 0;
+                Entry.FramesSinceJump = 0;
             }
             else
             {
-                E.FramesSinceJump += 1;
+                Entry.FramesSinceJump += 1;
             }
 
             if (wheelsContacting >= wheelThreshold ||
-                E.FramesSinceJump >= E.Settings.GetItem<int>("jump_boost_multiplier_frames"))
+                Entry.FramesSinceJump >= Entry.Settings.GetItem<int>("jump_boost_multiplier_frames"))
             {
-                __instance.accelerationMul_ = E.Settings.GetItem<float>("default_boost_multiplier");
+                __instance.accelerationMul_ = Entry.Settings.GetItem<float>("default_boost_multiplier");
             }
             else
             {
-                __instance.accelerationMul_ = E.Settings.GetItem<float>("jump_boost_multiplier");
+                __instance.accelerationMul_ = Entry.Settings.GetItem<float>("jump_boost_multiplier");
             }
 
             _prevJumpTimer = jumpTimer;
@@ -175,7 +183,7 @@ namespace WBFix
         [UsedImplicitly]
         private static void Postfix()
         {
-            E.FramesSinceJump = E.Settings.GetItem<int>("jump_boost_multiplier_frames");
+            Entry.FramesSinceJump = Entry.Settings.GetItem<int>("jump_boost_multiplier_frames");
         }
     }
 
@@ -185,7 +193,7 @@ namespace WBFix
         [UsedImplicitly]
         private static void Postfix()
         {
-            E.FramesSinceJump = E.Settings.GetItem<int>("jump_boost_multiplier_frames");
+            Entry.FramesSinceJump = Entry.Settings.GetItem<int>("jump_boost_multiplier_frames");
         }
     }
 
@@ -195,8 +203,8 @@ namespace WBFix
         [UsedImplicitly]
         private static bool Prefix(ref float intensity)
         {
-            var buffMult = E.Settings.GetItem<float>("default_boost_multiplier");
-            var nerfMult = E.Settings.GetItem<float>("jump_boost_multiplier");
+            var buffMult = Entry.Settings.GetItem<float>("default_boost_multiplier");
+            var nerfMult = Entry.Settings.GetItem<float>("jump_boost_multiplier");
             // ReSharper disable once CompareOfFloatsByEqualityOperator
             if (buffMult != nerfMult)
             {

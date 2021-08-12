@@ -1,7 +1,9 @@
 {
     "FriendlyName": "WBFix",
     "Author": "Seekr",
-    "AuthorContact": "Discord: Seekr#3274; Steam: Seeker14491",
+    "Contact": "Discord: Seekr#3274; Steam: Seeker14491",
+    "Porter": "Tiyenti",
+	"PorterContact": "Discord: Tiyenti#3201 | Twitter: @TiyentiSR",
     "IPCIdentifier": "WBFix",
 
     "ModuleFileName": "WBFix.dll",
