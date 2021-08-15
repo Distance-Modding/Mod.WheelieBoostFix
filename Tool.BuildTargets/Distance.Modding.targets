@@ -1,0 +1,15 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+	<Import Project="$(SolutionDir)Tool.ProjectTargets\Distance.ProjectTargets.targets"/>
+	<Import Project="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).props"/>
+	
+	<Target Name="CreateBuild" AfterTargets="AfterBuild">
+		<MakeDir Directories="$(ModFolder)"/>
+		<MakeDir Directories="$(GSLFolder)"/>
+		<Copy SourceFiles="@(ModContent)" DestinationFiles="@(ModContent->'$(ModFolder)\%(RecursiveDir)%(Filename)%(Extension)')"/>
+		<Copy SourceFiles="$(OutDir)Centrifuge.Distance.dll" DestinationFolder="$(GSLFolder)"/>
+		<Copy SourceFiles="$(OutDir)$(ProjectName).dll" DestinationFolder="$(ModFolder)"/>
+	</Target>
+	<Target Name="CreateZip" AfterTargets="AfterBuild" DependsOnTargets="CreateBuild">
+		<ZipDirectory SourceDirectory="$(BuildDestination)" DestinationFile="$(BuildDestination).zip" Overwrite="true"/>
+	</Target>
+</Project>

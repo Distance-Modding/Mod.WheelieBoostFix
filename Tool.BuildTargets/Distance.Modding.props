@@ -1,0 +1,12 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <ItemGroup>
+        <ModContent Include="$(ProjectDir)\..\$(ProjectName).Content\Mod\**\*.*"/>
+    </ItemGroup>
+    <PropertyGroup>
+        <ModName Condition="'$(ModName)' == ''">$(ProjectName)</ModName>
+        <BuildRoot>$(SolutionDir)Build/</BuildRoot>
+        <BuildDestination>$(BuildRoot)$(ModName)</BuildDestination>
+        <ModFolder>$(BuildDestination)\Centrifuge\Mods\$(ModName)</ModFolder>
+        <GSLFolder>$(BuildDestination)\Centrifuge\GameSupport</GSLFolder>
+    </PropertyGroup>
+</Project>
