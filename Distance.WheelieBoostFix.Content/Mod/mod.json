@@ -1,0 +1,11 @@
+{
+	"FriendlyName": "Distance Wheelie Boost Fix",
+	"Author": "Seekr | Ported by Tiyenti",
+	"Contact": "Discord: Seekr#3274; Steam: Seeker14491",
+	"ModuleFileName": "Distance.WheelieBoostFix.dll",
+	"RequiredGSLs": [
+		"com.github.reherc/Centrifuge.Distance"
+	],
+	"SkipLoad": false,
+	"Priority": 10
+}
