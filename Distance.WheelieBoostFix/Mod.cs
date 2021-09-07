@@ -76,7 +76,7 @@ namespace Distance.WheelieBoostFix
 		public bool GameplayCheatsAllowed()
 		{
 			NetworkingManager networking = G.Sys.NetworkingManager_;
-			return networking?.IsOnline_ == true;
+			return networking?.IsOnline_ == false;
 		}
 	}
 }

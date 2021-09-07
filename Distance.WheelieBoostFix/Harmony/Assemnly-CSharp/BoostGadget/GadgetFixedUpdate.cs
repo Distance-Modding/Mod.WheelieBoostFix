@@ -10,13 +10,13 @@ namespace Distance.WheelieBoostFix.Harmony
 		[HarmonyPrefix]
 		internal static bool Prefix(BoostGadget __instance)
 		{
-			CarLogicData data = __instance.carLogic_.GetOrAddComponent<CarLogicData>();
-
 			CarLogic carLogic = __instance.carLogic_;
 			CarStats carStats = carLogic?.CarStats_;
 			JumpGadget jumpGadget = carLogic?.Jump_;
 
-			if (!carLogic.IsLocalCar_ || !jumpGadget || !Mod.Instance.GameplayCheatsAllowed())
+			CarLogicData data = __instance.carLogic_.GetOrAddComponent<CarLogicData>();
+
+			if (!carLogic.IsLocalCar_ || jumpGadget == null || !Mod.Instance.GameplayCheatsAllowed())
 			{
 				return true;
 			}
