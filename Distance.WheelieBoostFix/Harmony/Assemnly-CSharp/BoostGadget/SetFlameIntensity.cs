@@ -7,7 +7,7 @@ namespace Distance.WheelieBoostFix.Harmony
 	internal static class BoostGadget__SetFlameIntensity
 	{
 		[HarmonyPrefix]
-		internal static void Prefix(BoostGadget __instance, ref float intensity)
+		internal static void Prefix(ref float intensity)
 		{
 			float buffMult = Mod.Instance.Configuration.DefaultBoostMultiplier;
 			float nerfMult = Mod.Instance.Configuration.JumpBoostMultiplier;
@@ -15,7 +15,6 @@ namespace Distance.WheelieBoostFix.Harmony
 			if (buffMult.CompareTo(nerfMult) != 0)
 			{
 				intensity = (intensity + buffMult - (2 * nerfMult)) / (buffMult - nerfMult);
-				//intensity *= Mathf.Pow(__instance.flameIntensityCoef_, intensity);
 			}
 		}
 	}
